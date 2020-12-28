@@ -7,25 +7,25 @@ end)
 
 RegisterServerEvent('frp_weapondealer:server:giveDeliveryItems')
 AddEventHandler('frp_weapondealer:server:giveDeliveryItems', function()
-    RSCore.Functions.BanInjection(source, 'frp_weapondealer (giveDeliveryItems)')
+    QBCore.Functions.BanInjection(source, 'frp_weapondealer (giveDeliveryItems)')
 end)
 
-RSCore.Functions.CreateCallback('frp_weapondealer:giveDeliveryItems', function(source, cb, amount)
+QBCore.Functions.CreateCallback('frp_weapondealer:giveDeliveryItems', function(source, cb, amount)
     local src = source
-    local Player = RSCore.Functions.GetPlayer(src)
+    local Player = QBCore.Functions.GetPlayer(src)
 
     Player.Functions.AddItem('explosive', amount)
-    TriggerClientEvent('inventory:client:ItemBox', src, RSCore.Shared.Items["explosive"], "add")
+    TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items["explosive"], "add")
 end)
 
-RSCore.Functions.CreateCallback('frp_weapondealer:server:RequestConfig', function(source, cb)
+QBCore.Functions.CreateCallback('frp_weapondealer:server:RequestConfig', function(source, cb)
     cb(Config.Dealers)
 end)
 
 RegisterServerEvent('frp_weapondealer:server:succesDelivery')
 AddEventHandler('frp_weapondealer:server:succesDelivery', function(deliveryData, inTime)
     local src = source
-    local Player = RSCore.Functions.GetPlayer(src)
+    local Player = QBCore.Functions.GetPlayer(src)
     local curRep = Player.PlayerData.metadata["wepdealerrep"]
 
     if inTime then
@@ -52,8 +52,8 @@ AddEventHandler('frp_weapondealer:server:succesDelivery', function(deliveryData,
                 Player.Functions.AddMoney('cash', (deliveryData["amount"] * price / 100 * 18), "dilvery-guns")
             end
 
-            TriggerClientEvent('inventory:client:ItemBox', src, RSCore.Shared.Items["explosive"], "remove")
-            TriggerClientEvent('RSCore:Notify', src, 'The order has been delivered complete', 'success')
+            TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items["explosive"], "remove")
+            TriggerClientEvent('QBCore:Notify', src, 'The order has been delivered complete', 'success')
 
             SetTimeout(math.random(5000, 10000), function()
                 TriggerClientEvent('frp_weapondealer:client:sendDeliveryMail', src, 'perfect', deliveryData)
@@ -61,14 +61,14 @@ AddEventHandler('frp_weapondealer:server:succesDelivery', function(deliveryData,
                 Player.Functions.SetMetaData('wepdealerrep', (curRep + 1))
             end)
         else
-            TriggerClientEvent('RSCore:Notify', src, 'This does not match the order...', 'error')
+            TriggerClientEvent('QBCore:Notify', src, 'This does not match the order...', 'error')
 
             if Player.Functions.GetItemByName('explosive').amount >= 0 then
                 Player.Functions.RemoveItem('explosive', Player.Functions.GetItemByName('explosive').amount)
                 Player.Functions.AddMoney('cash', (Player.Functions.GetItemByName('explosive').amount * 6000 / 100 * 5))
             end
 
-            TriggerClientEvent('inventory:client:ItemBox', src, RSCore.Shared.Items["explosive"], "remove")
+            TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items["explosive"], "remove")
 
             SetTimeout(math.random(5000, 10000), function()
                 TriggerClientEvent('frp_weapondealer:client:sendDeliveryMail', src, 'bad', deliveryData)
@@ -81,12 +81,12 @@ AddEventHandler('frp_weapondealer:server:succesDelivery', function(deliveryData,
             end)
         end
     else
-        TriggerClientEvent('RSCore:Notify', src, 'Youre too late...', 'error')
+        TriggerClientEvent('QBCore:Notify', src, 'Youre too late...', 'error')
 
         Player.Functions.RemoveItem('explosive', deliveryData["amount"])
         Player.Functions.AddMoney('cash', (deliveryData["amount"] * 6000 / 100 * 4), "dilvery-guns-too-late")
 
-        TriggerClientEvent('inventory:client:ItemBox', src, RSCore.Shared.Items["explosive"], "remove")
+        TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items["explosive"], "remove")
 
         SetTimeout(math.random(5000, 10000), function()
             TriggerClientEvent('frp_weapondealer:client:sendDeliveryMail', src, 'late', deliveryData)
@@ -108,12 +108,12 @@ AddEventHandler('frp_weapondealer:server:callCops', function(streetLabel, coords
         coords = {x = coords.x, y = coords.y, z = coords.z},
         description = msg
     }
-    for k, v in pairs(RSCore.Functions.GetPlayers()) do
-        local Player = RSCore.Functions.GetPlayer(v)
+    for k, v in pairs(QBCore.Functions.GetPlayers()) do
+        local Player = QBCore.Functions.GetPlayer(v)
         if Player ~= nil then 
             if (Player.PlayerData.job.name == "police" and Player.PlayerData.job.onduty) then
                 TriggerClientEvent("frp_weapondealer:client:robberyCall", Player.PlayerData.source, msg, streetLabel, coords)
-                TriggerClientEvent("rs-phone:client:addPoliceAlert", Player.PlayerData.source, alertData)
+                TriggerClientEvent("qb-phone:client:addPoliceAlert", Player.PlayerData.source, alertData)
             end
         end
 	end
@@ -121,8 +121,8 @@ end)
 
 function GetCurrentCops()
     local amount = 0
-    for k, v in pairs(RSCore.Functions.GetPlayers()) do
-        local Player = RSCore.Functions.GetPlayer(v)
+    for k, v in pairs(QBCore.Functions.GetPlayers()) do
+        local Player = QBCore.Functions.GetPlayer(v)
         if Player ~= nil then 
             if (Player.PlayerData.job.name == "police" and Player.PlayerData.job.onduty) then
                 amount = amount + 1

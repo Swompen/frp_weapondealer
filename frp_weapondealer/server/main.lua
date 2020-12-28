@@ -1,6 +1,6 @@
-RSCore = nil
+QBCore = nil
 
-TriggerEvent('RSCore:GetObject', function(obj) RSCore = obj end)
+TriggerEvent('QBCore:GetObject', function(obj) QBCore = obj end)
 
 -- Code
 

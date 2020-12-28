@@ -14,9 +14,9 @@ local isHealingPerson = false
 local healAnimDict = "mini@cpr@char_a@cpr_str"
 local healAnim = "cpr_pumpchest"
 
-RegisterNetEvent('RSCore:Client:OnPlayerLoaded')
-AddEventHandler('RSCore:Client:OnPlayerLoaded', function()
-    RSCore.Functions.TriggerCallback('frp_weapondealer:server:RequestConfig', function(DealerConfig)
+RegisterNetEvent('QBCore:Client:OnPlayerLoaded')
+AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
+    QBCore.Functions.TriggerCallback('frp_weapondealer:server:RequestConfig', function(DealerConfig)
         Config.Dealers = DealerConfig
     end)
 end)
@@ -60,7 +60,7 @@ Citizen.CreateThread(function()
                                     if player ~= -1 and distance < 5.0 then
                                         local playerId = GetPlayerServerId(player)
                                         isHealingPerson = true
-                                        RSCore.Functions.Progressbar("hospital_revive", "Help the person up..", 5000, false, true, {
+                                        QBCore.Functions.Progressbar("hospital_revive", "Help the person up..", 5000, false, true, {
                                             disableMovement = false,
                                             disableCarMovement = false,
                                             disableMouse = false,
@@ -72,15 +72,15 @@ Citizen.CreateThread(function()
                                         }, {}, {}, function() -- Done
                                             isHealingPerson = false
                                             StopAnimTask(GetPlayerPed(-1), healAnimDict, "exit", 1.0)
-                                            RSCore.Functions.Notify("Du hjälpte personen!")
+                                            QBCore.Functions.Notify("Du hjälpte personen!")
                                             TriggerServerEvent("hospital:server:RevivePlayer", playerId, true)
                                         end, function() -- Cancel
                                             isHealingPerson = false
                                             StopAnimTask(GetPlayerPed(-1), healAnimDict, "exit", 1.0)
-                                            RSCore.Functions.Notify("Misslyckades", "error")
+                                            QBCore.Functions.Notify("Misslyckades", "error")
                                         end)
                                     else
-                                        RSCore.Functions.Notify("Det finns ingen i närheten..", "error")
+                                        QBCore.Functions.Notify("Det finns ingen i närheten..", "error")
                                     end
                                 else
                                     if waitingDelivery == nil then
@@ -109,7 +109,7 @@ Citizen.CreateThread(function()
 end)
 
 function GetClosestPlayer()
-    local closestPlayers = RSCore.Functions.GetPlayersFromCoords()
+    local closestPlayers = QBCore.Functions.GetPlayersFromCoords()
     local closestDistance = -1
     local closestPlayer = -1
     local coords = GetEntityCoords(GetPlayerPed(-1))
@@ -158,7 +158,7 @@ function buyDealerStuff()
     repItems.slots = 30
 
     for k, v in pairs(Config.Dealers[currentDealer]["products"]) do
-        if RSCore.Functions.GetPlayerData().metadata["wepdealerrep"] >= Config.Dealers[currentDealer]["products"][k].minrep then
+        if QBCore.Functions.GetPlayerData().metadata["wepdealerrep"] >= Config.Dealers[currentDealer]["products"][k].minrep then
             repItems.items[k] = Config.Dealers[currentDealer]["products"][k]
         end
     end
@@ -170,7 +170,7 @@ function knockDoorAnim(home)
     local knockAnimLib = "timetable@jimmy@doorknock@"
     local knockAnim = "knockdoor_idle"
     local PlayerPed = GetPlayerPed(-1)
-    local myData = RSCore.Functions.GetPlayerData()
+    local myData = QBCore.Functions.GetPlayerData()
 
     if home then
         TriggerServerEvent("InteractSound_SV:PlayOnSource", "knock_door", 0.2)
@@ -208,7 +208,7 @@ function knockDoorAnim(home)
         TaskPlayAnim(PlayerPed, knockAnimLib, "exit", 3.0, 3.0, -1, 1, 0, false, false, false)
         knockingDoor = false
         Citizen.Wait(1000)
-        RSCore.Functions.Notify('No one seems to be home..', 'error', 3500)
+        QBCore.Functions.Notify('No one seems to be home..', 'error', 3500)
     end
 end
 
@@ -233,13 +233,13 @@ function requestDelivery()
         ["dealer"] = currentDealer,
         ["itemData"] = Config.DeliveryItems[item]
     }
-    RSCore.Functions.TriggerCallback('frp_weapondealer:giveDeliveryItems', function()
+    QBCore.Functions.TriggerCallback('frp_weapondealer:giveDeliveryItems', function()
     end, amount)
     SetTimeout(7000, function()
-        TriggerServerEvent('rs-phone:server:sendNewMail', {
+        TriggerServerEvent('qb-phone:server:sendNewMail', {
             sender = Config.Dealers[currentDealer]["name"],
             subject = "Place of delivery",
-            message = "Here is all the information about your delivery, <br>Place: "..waitingDelivery["locationLabel"].."<br>Goods: <br> "..amount.."x "..RSCore.Shared.Items[waitingDelivery["itemData"]["item"]]["label"].."<br><br> Make sure you are on time!",
+            message = "Here is all the information about your delivery, <br>Place: "..waitingDelivery["locationLabel"].."<br>Goods: <br> "..amount.."x "..QBCore.Shared.Items[waitingDelivery["itemData"]["item"]]["label"].."<br><br> Make sure you are on time!",
             button = {
                 enabled = true,
                 buttonEvent = "frp_weapondealer:client:setLocation",
@@ -251,7 +251,7 @@ end
 
 function randomDeliveryItemOnRep()
     local ped = GetPlayerPed(-1)
-    local myRep = RSCore.Functions.GetPlayerData().metadata["wepdealerrep"]
+    local myRep = QBCore.Functions.GetPlayerData().metadata["wepdealerrep"]
 
     retval = nil
 
@@ -270,7 +270,7 @@ end
 
 function setMapBlip(x, y)
     SetNewWaypoint(x, y)
-    RSCore.Functions.Notify('The route to the delivery point is indicated on your map.', 'success');
+    QBCore.Functions.Notify('The route to the delivery point is indicated on your map.', 'success');
 end
 
 RegisterNetEvent('frp_weapondealer:client:setLocation')
@@ -279,7 +279,7 @@ AddEventHandler('frp_weapondealer:client:setLocation', function(locationData)
         activeDelivery = locationData
     else
         setMapBlip(activeDelivery["coords"]["x"], activeDelivery["coords"]["y"])
-        RSCore.Functions.Notify('You still have an active delivery...')
+        QBCore.Functions.Notify('You still have an active delivery...')
         return
     end
 
@@ -302,7 +302,7 @@ AddEventHandler('frp_weapondealer:client:setLocation', function(locationData)
                 if dist < 15 then
                     inDeliveryRange = true
                     if dist < 1.5 then
-                        DrawText3D(activeDelivery["coords"]["x"], activeDelivery["coords"]["y"], activeDelivery["coords"]["z"], '[E] '..activeDelivery["amount"]..'x '..RSCore.Shared.Items[activeDelivery["itemData"]["item"]]["label"]..' to deliver.')
+                        DrawText3D(activeDelivery["coords"]["x"], activeDelivery["coords"]["y"], activeDelivery["coords"]["z"], '[E] '..activeDelivery["amount"]..'x '..QBCore.Shared.Items[activeDelivery["itemData"]["item"]]["label"]..' to deliver.')
 
                         if IsControlJustPressed(0, Keys["E"]) then
                             deliverStuff(activeDelivery)
@@ -347,7 +347,7 @@ function deliverStuff(activeDelivery)
         Citizen.Wait(500)
         TriggerEvent('animations:client:EmoteCommandStart', {"bumbin"})
         checkPedDistance()
-        RSCore.Functions.Progressbar("work_dropbox", "Delivers products..", 3500, false, true, {
+        QBCore.Functions.Progressbar("work_dropbox", "Delivers products..", 3500, false, true, {
             disableMovement = true,
             disableCarMovement = true,
             disableMouse = false,
@@ -356,7 +356,7 @@ function deliverStuff(activeDelivery)
             TriggerServerEvent('frp_weapondealer:server:succesDelivery', activeDelivery, true)
         end, function() -- Cancel
             ClearPedTasks(GetPlayerPed(-1))
-            RSCore.Functions.Notify("Canceled..", "error")
+            QBCore.Functions.Notify("Canceled..", "error")
         end)
     else
         TriggerServerEvent('frp_weapondealer:server:succesDelivery', activeDelivery, false)
@@ -373,7 +373,7 @@ function checkPedDistance()
         end
     end
     
-    local closestPed, closestDistance = RSCore.Functions.GetClosestPed(coords, PlayerPeds)
+    local closestPed, closestDistance = QBCore.Functions.GetClosestPed(coords, PlayerPeds)
 
     if closestDistance < 40 and closestPed ~= 0 then
         local callChance = math.random(1, 100)
@@ -419,7 +419,7 @@ AddEventHandler('frp_weapondealer:client:robberyCall', function(msg, streetLabel
 				detail = streetLabel,
 			},
 		},
-		callSign = RSCore.Functions.GetPlayerData().metadata["callsign"],
+		callSign = QBCore.Functions.GetPlayerData().metadata["callsign"],
 	})
     local transG = 250
     local blip = AddBlipForCoord(coords.x, coords.y, coords.z)
@@ -451,19 +451,19 @@ end)
 RegisterNetEvent('frp_weapondealer:client:sendDeliveryMail')
 AddEventHandler('frp_weapondealer:client:sendDeliveryMail', function(type, deliveryData)
     if type == 'perfect' then
-        TriggerServerEvent('rs-phone:server:sendNewMail', {
+        TriggerServerEvent('qb-phone:server:sendNewMail', {
             sender = Config.Dealers[deliveryData["dealer"]]["name"],
             subject = "Delivery",
             message = "You did a great job! I hope to do business with you again soon ;)<br><br>Greetings, "..Config.Dealers[deliveryData["dealer"]]["name"]
         })
     elseif type == 'bad' then
-        TriggerServerEvent('rs-phone:server:sendNewMail', {
+        TriggerServerEvent('qb-phone:server:sendNewMail', {
             sender = Config.Dealers[deliveryData["dealer"]]["name"],
             subject = "Delivery",
             message = "I'm getting a complaint about your delivery, do not let this happen again..."
         })
     elseif type == 'late' then
-        TriggerServerEvent('rs-phone:server:sendNewMail', {
+        TriggerServerEvent('qb-phone:server:sendNewMail', {
             sender = Config.Dealers[deliveryData["dealer"]]["name"],
             subject = "Delivery",
             message = "You were not on time. You had more important things to do than business?"

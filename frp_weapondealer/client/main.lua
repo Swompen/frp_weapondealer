@@ -1,11 +1,11 @@
-RSCore = nil
+QBCore = nil
 CurrentCops = 0
 
 Citizen.CreateThread(function()
     while true do
         Citizen.Wait(10)
-        if RSCore == nil then
-            TriggerEvent('RSCore:GetObject', function(obj) RSCore = obj end)
+        if QBCore == nil then
+            TriggerEvent('QBCore:GetObject', function(obj) QBCore = obj end)
             Citizen.Wait(200)
         end
     end
