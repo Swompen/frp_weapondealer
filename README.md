@@ -1,7 +1,7 @@
 ### FRP Weaponsdealer
 
 - QBCore
-- You do deliveries to earn "rep" and after X amount of rep you can buy weapons and attacheements 
+- You do deliveries to earn "rep" and after X amount of rep you can buy weapons and attachments 
 - Time of day (ingame controlled)
 
 #### How to install
